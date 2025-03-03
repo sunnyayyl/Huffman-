@@ -63,7 +63,7 @@ fn merge_2_smallest_node<T>(tree: &mut NodePriorityQueue<T>) {
 }
 fn create_tree<'a, T>(data: &'a [T]) -> (NodePriorityQueue<'a, T>, usize)
 where
-    T: Eq + std::fmt::Debug,
+    T: Eq,
     T: Hash,
 {
     let mut probability: HashMap<&T, usize> = HashMap::new();
@@ -77,15 +77,15 @@ where
             weight: *occurrence,
         }))))
     }
-    let depth = tree.len();
+    let unique_symbol_len= tree.len();
     while tree.len() > 1 {
         merge_2_smallest_node(&mut tree);
     }
-    (tree, depth)
+    (tree, unique_symbol_len)
 }
 fn generate_lookup<'a, T>(root_node: Node<'a, T>, depth: usize) -> HashMap<&'a T, usize>
 where
-    T: Eq + std::fmt::Debug,
+    T: Eq,
     T: Hash,
 {
     let mut lookup: HashMap<&'a T, usize> = HashMap::with_capacity(depth);
@@ -106,7 +106,6 @@ where
                 }
             }
         }
-        println!("{:#?}", walk_queue);
     }
 
     lookup
@@ -117,8 +116,7 @@ fn main() {
     //let string="this is an example of a huffman tree";
     println!("{:?}", string);
     let data = string.chars().collect::<Vec<char>>();
-    let byte = string.as_bytes();
-    let (mut tree, depth) = create_tree(&data);
+    let (mut tree, _) = create_tree(&data);
     let tree = tree.pop().unwrap().0;
     println!("{:#?}", tree);
     let lookup = generate_lookup(tree, depth);
