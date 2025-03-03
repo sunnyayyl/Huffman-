@@ -77,18 +77,18 @@ where
             weight: *occurrence,
         }))))
     }
-    let unique_symbol_len= tree.len();
+    let unique_symbol_count= tree.len();
     while tree.len() > 1 {
         merge_2_smallest_node(&mut tree);
     }
-    (tree, unique_symbol_len)
+    (tree, unique_symbol_count)
 }
-fn generate_lookup<'a, T>(root_node: Node<'a, T>, depth: usize) -> HashMap<&'a T, usize>
+fn generate_lookup<'a, T>(root_node: Node<'a, T>, symbol_count: usize) -> HashMap<&'a T, usize>
 where
     T: Eq,
     T: Hash,
 {
-    let mut lookup: HashMap<&'a T, usize> = HashMap::with_capacity(depth);
+    let mut lookup: HashMap<&'a T, usize> = HashMap::with_capacity(symbol_count);
     let mut walk_queue = VecDeque::with_capacity(2);
     walk_queue.push_back((root_node, 0));
     while let Some((node, current)) = walk_queue.pop_front() {
@@ -116,9 +116,9 @@ fn main() {
     //let string="this is an example of a huffman tree";
     println!("{:?}", string);
     let data = string.chars().collect::<Vec<char>>();
-    let (mut tree, _) = create_tree(&data);
+    let (mut tree, count) = create_tree(&data);
     let tree = tree.pop().unwrap().0;
     println!("{:#?}", tree);
-    let lookup = generate_lookup(tree, depth);
+    let lookup = generate_lookup(tree, count);
     println!("{:#?}", lookup);
 }
