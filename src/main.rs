@@ -15,15 +15,14 @@ impl<'a, T> PartialEq<Self> for NodeOrderHelper<'a, T> {
 impl<'a, T> Eq for NodeOrderHelper<'a, T> {}
 impl<'a, T> PartialOrd for NodeOrderHelper<'a, T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.0.weight().partial_cmp(&other.0.weight())?.reverse())
+        Some(self.0.weight().cmp(&other.0.weight()).reverse())
     }
 }
 impl<'a, T> Ord for NodeOrderHelper<'a, T> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0
             .weight()
-            .partial_cmp(&other.0.weight())
-            .unwrap()
+            .cmp(&other.0.weight())
             .reverse()
     }
 }
@@ -60,15 +59,31 @@ impl HuffmanCode {
         Self { depth: 0, code: 0 }
     }
     fn left(&self) -> Self {
-        Self { depth: self.depth + 1, code: self.code<<1 }
+        Self {
+            depth: self.depth + 1,
+            code: self.code << 1,
+        }
     }
     fn right(&self) -> Self {
-        Self { depth: self.depth + 1, code: (self.code<<1)+1 }
+        Self {
+            depth: self.depth + 1,
+            code: (self.code << 1) + 1,
+        }
     }
 }
 impl Display for HuffmanCode {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}{:b}", "0".repeat(self.depth.checked_sub( format!("{:b}", self.code).len()).or(Some(0)).unwrap()), self.code)
+        write!(
+            f,
+            "{}{:b}",
+            "0".repeat(
+                self.depth
+                    .checked_sub(format!("{:b}", self.code).len())
+                    .or(Some(0))
+                    .unwrap()
+            ),
+            self.code
+        )
     }
 }
 fn merge_2_smallest_node<T>(tree: &mut NodePriorityQueue<T>) {
@@ -97,13 +112,16 @@ where
             weight: *occurrence,
         }))))
     }
-    let unique_symbol_count= tree.len();
+    let unique_symbol_count = tree.len();
     while tree.len() > 1 {
         merge_2_smallest_node(&mut tree);
     }
     (tree, unique_symbol_count)
 }
-fn generate_lookup<'a, T>(root_node: Node<'a, T>, symbol_count: usize) -> HashMap<&'a T, HuffmanCode>
+fn generate_lookup<'a, T>(
+    root_node: Node<'a, T>,
+    symbol_count: usize,
+) -> HashMap<&'a T, HuffmanCode>
 where
     T: Eq,
     T: Hash,
